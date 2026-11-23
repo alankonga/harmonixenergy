@@ -1,237 +1,30 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Products Catalogue | Harmonix Energy</title>
-  <meta name="description" content="Browse solar panels, inverters, batteries, charge controllers and electrical accessories supplied by Harmonix Energy.">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <style>
-    .catalog-product{cursor:pointer}
-    .catalog-product .product-image{cursor:pointer}
-    .product-actions{display:flex;gap:9px;align-items:center;margin-top:14px}
-    .product-actions .btn{flex:1;padding:10px 12px}
-    .details-btn{border:1px solid #d5e0eb;background:#fff;color:var(--navy);border-radius:999px;padding:10px 13px;font-size:12px;font-weight:800;cursor:pointer}
-    .details-btn:hover{border-color:var(--green);color:var(--green2);background:#f1faf5}
-    .product-modal{position:fixed;inset:0;z-index:1000;background:rgba(4,19,38,.68);display:none;align-items:center;justify-content:center;padding:20px}
-    .product-modal.open{display:flex}
-    .product-modal-panel{position:relative;width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
-    .product-modal-close{position:absolute;right:14px;top:14px;z-index:2;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:var(--navy);font-size:24px;line-height:1;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.14)}
-    .product-modal-content{display:grid;grid-template-columns:.9fr 1.1fr}
-    .product-modal-image{min-height:360px;background:#f3f7fa}
-    .product-modal-image img{width:100%;height:100%;object-fit:cover}
-    .product-modal-copy{padding:36px 30px}
-    .product-modal-copy h2{color:var(--navy);font-size:27px;line-height:1.15;margin:12px 0}
-    .product-modal-copy p{font-size:14px;color:var(--muted)}
-    .product-specs{padding-left:19px;margin:18px 0 24px;color:#40536b;font-size:13px}
-    .product-specs li{margin:8px 0}
-    .product-modal-copy .btn{width:100%}
-    .details-hint{font-size:11px;color:var(--muted);margin-top:8px}
-    @media(max-width:620px){.product-modal{padding:10px}.product-modal-content{grid-template-columns:1fr}.product-modal-image{min-height:190px;height:190px}.product-modal-copy{padding:24px 20px}.product-modal-copy h2{font-size:23px}.product-actions{flex-direction:column;align-items:stretch}.product-actions>*{width:100%}}
-
-    /* Responsive and browser-zoom safeguards */
-    *,*::before,*::after{box-sizing:border-box}
-    html{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-    body{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
-    img,svg,video,iframe{max-width:100%;height:auto}
-    .container,.nav,.catalog-layout,.catalog-toolbar,.grid,.product-grid-catalog,
-    .product-card,.card-body,.page-hero,.section,.footer-grid,.footer-bottom{min-width:0;max-width:100%}
-    .catalog-layout{display:grid;grid-template-columns:minmax(190px,240px) minmax(0,1fr);gap:clamp(16px,3vw,30px)}
-    .product-grid-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:clamp(14px,2vw,22px)}
-    .product-card{min-width:0;overflow:hidden}
-    .product-card h3,.product-card p,.page-hero h1,.page-hero p,.product-modal-copy h2,
-    .product-modal-copy p,.notice,.footer a,.footer p{overflow-wrap:anywhere;word-break:normal}
-    .product-image{width:100%;aspect-ratio:16/10;overflow:hidden}
-    .product-image img{display:block;width:100%;height:100%;object-fit:cover}
-    .catalog-toolbar{display:flex;flex-wrap:wrap;gap:12px}
-    .catalog-toolbar>*{flex:1 1 190px;min-width:0}
-    .product-actions{flex-wrap:wrap}
-    .product-actions>*{min-width:0}
-    .product-modal{overflow-y:auto;overscroll-behavior:contain}
-    .product-modal-panel{width:min(760px,100%);max-height:min(90dvh,900px);max-height:min(90vh,900px);overflow:auto}
-    .product-modal-content{min-width:0}
-    .product-modal-copy{min-width:0}
-    .product-modal-copy .btn{white-space:normal;text-align:center}
-    .product-specs{padding-inline-start:20px}
-    button,a,input,select{max-width:100%}
-    input,select,button{font:inherit}
-    @media(max-width:900px){
-      .catalog-layout{grid-template-columns:minmax(0,1fr)}
-      .filters{width:100%}
-      .filter-list{display:flex;flex-wrap:wrap;gap:8px}
-      .filter-btn{max-width:100%}
-    }
-    @media(max-width:620px){
-      .container{width:min(100% - 28px,100%)}
-      .catalog-layout{gap:20px}
-      .product-grid-catalog{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
-      .product-modal{padding:8px;align-items:flex-start}
-      .product-modal-panel{margin:auto 0;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px)}
-      .product-modal-content{grid-template-columns:minmax(0,1fr)}
-      .product-modal-image{height:clamp(150px,38vw,230px);min-height:0}
-      .product-modal-copy{padding:clamp(18px,5vw,26px)}
-      .product-actions{flex-direction:column;align-items:stretch}
-      .product-actions>*{width:100%}
-    }
-    @media(max-width:380px){
-      .container{width:calc(100% - 22px)}
-      .product-grid-catalog{grid-template-columns:minmax(0,1fr)}
-      .product-modal-copy h2{font-size:clamp(20px,7vw,24px)}
-      .product-modal-copy .btn{font-size:13px;padding:11px 12px}
-    }
-    @media(prefers-reduced-motion:reduce){
-      *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
-    }
-  </style>
-</head>
-<body>
-<div class="topbar"><div class="container"><span>Solar • Electrical • Security Solutions</span><span>Kenya-wide enquiries&nbsp; | &nbsp; +254 706 813 495</span></div></div>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Products | Harmonix Energy</title><meta name="description" content="Solar panels, inverters, batteries, charge controllers, mounting structures and electrical accessories. Build an enquiry list and request prices."><meta name="theme-color" content="#0F2A52">
+<meta property="og:title" content="Products | Harmonix Energy"><meta property="og:description" content="Solar panels, inverters, batteries, charge controllers, mounting structures and electrical accessories. Build an enquiry list and request prices."><meta property="og:type" content="website">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap">
+<link rel="stylesheet" href="assets/css/style.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol><symbol id="i-panel" viewBox="0 0 24 24"><path d="M3 8l2-4h14l2 4v10H3z"/><path d="M3 13h18M9 4 8 18M15 4l1 14"/></symbol><symbol id="i-water" viewBox="0 0 24 24"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></symbol><symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 4.9 4.9l-9.7 9.7a2.1 2.1 0 0 1-3-3z"/><path d="M14 4l6 6"/></symbol><symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/></symbol><symbol id="i-fence" viewBox="0 0 24 24"><path d="M4 20V8l2-3 2 3v12M10 20V8l2-3 2 3v12M16 20V8l2-3 2 3v12M3 12h18M3 16h18"/></symbol><symbol id="i-light" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></symbol><symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></symbol><symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol><symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h3l2.5 11h10L21 7H7"/></symbol><symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol><symbol id="i-cable" viewBox="0 0 24 24"><path d="M4 18c6 0 4-12 10-12h6"/><path d="M18 3v6M21 3v6"/></symbol><symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol><symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.6.3.1.2.1.8-.1 1.4z"/></symbol></defs></svg><a class="skip" href="#main">Skip to content</a>
+<div class="topbar"><div class="container"><span>Solar &bull; Electrical &bull; Security solutions across Kenya</span><span><a href="tel:+254706813495">Call +254 706 813 495</a> &nbsp;&middot;&nbsp; <a href="mailto:harmonixenergysolutions@gmail.com">harmonixenergysolutions@gmail.com</a></span></div></div>
 <header class="site-header"><div class="container nav">
-  <a class="brand" href="index.html"><span class="brand-mark">ϟ</span><span>HARMONIX<small>ENERGY SOLUTIONS</small></span></a>
-  <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
-  <nav class="nav-links"><a href="index.html">Home</a><a href="services.html">Services</a><a class="active" href="products.html">Products</a><a href="tools.html">Tools & Resources</a><a href="index.html#projects">Projects</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></nav>
-  <div class="nav-actions"><a class="btn" href="index.html#contact">Get a Quote <span>→</span></a></div>
-</div></header>
-<main>
-  <section class="page-hero"><div class="container"><span class="eyebrow">Equipment catalogue</span><h1>Quality products for reliable systems</h1><p>Browse solar and electrical equipment for residential, commercial and industrial applications. Select any product to view more information, then contact us for current availability, specifications and pricing.</p></div></section>
-  <section class="section"><div class="container"><div class="catalog-layout">
-    <aside class="filters"><h3>Product categories</h3><div class="filter-list">
-      <button class="filter-btn active" data-category="all">All products</button><button class="filter-btn" data-category="panels">Solar panels</button><button class="filter-btn" data-category="inverters">Inverters</button><button class="filter-btn" data-category="batteries">Batteries</button><button class="filter-btn" data-category="controllers">Charge controllers</button><button class="filter-btn" data-category="mounting">Mounting structures</button><button class="filter-btn" data-category="electrical">Electrical accessories</button>
-    </div></aside>
-    <div><div class="catalog-toolbar"><input class="field" id="product-search" placeholder="Search products..." aria-label="Search products"><select class="field" id="product-sort" aria-label="Sort products"><option>Sort: Featured</option></select></div>
-      <div class="grid product-grid-catalog">
-        <article class="card product-card catalog-product" data-category="panels">
-          <div class="product-image" data-open-product="panels"><img src="https://images.unsplash.com/photo-1509391366360-2e959784e9e8?auto=format&fit=crop&w=700&q=80" alt="Solar PV modules"></div>
-          <div class="card-body"><span class="product-tag">Solar panels</span><h3>Solar PV Modules</h3><p>High-efficiency modules in a range of wattages and technologies.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="panels">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing and specifications for solar PV modules.">Enquire →</a></div>
-          </div>
-        </article>
-        <article class="card product-card catalog-product" data-category="inverters">
-          <div class="product-image" data-open-product="inverters"><img src="https://images.unsplash.com/photo-1592833159155-c62df1b65634?auto=format&fit=crop&w=700&q=80" alt="Solar hybrid inverter"></div>
-          <div class="card-body"><span class="product-tag">Inverters</span><h3>Hybrid Inverters</h3><p>Single-phase and three-phase inverter options for solar and backup.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="inverters">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing and specifications for hybrid inverters.">Enquire →</a></div>
-          </div>
-        </article>
-        <article class="card product-card catalog-product" data-category="batteries">
-          <div class="product-image" data-open-product="batteries"><img src="https://images.unsplash.com/photo-1620714223084-8fcacca6e9f3?auto=format&fit=crop&w=700&q=80" alt="Battery storage unit"></div>
-          <div class="card-body"><span class="product-tag">Energy storage</span><h3>Lithium Batteries</h3><p>LiFePO4 battery options for residential and commercial storage.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="batteries">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing and specifications for lithium batteries.">Enquire →</a></div>
-          </div>
-        </article>
-        <article class="card product-card catalog-product" data-category="controllers">
-          <div class="product-image" data-open-product="controllers"><img src="https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=700&q=80" alt="Solar charge controller equipment"></div>
-          <div class="card-body"><span class="product-tag">Controllers</span><h3>MPPT Charge Controllers</h3><p>Solar charge controllers for compatible off-grid applications.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="controllers">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing and specifications for MPPT charge controllers.">Enquire →</a></div>
-          </div>
-        </article>
-        <article class="card product-card catalog-product" data-category="mounting">
-          <div class="product-image" data-open-product="mounting"><img src="https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=700&q=80" alt="Solar panel mounting structure"></div>
-          <div class="card-body"><span class="product-tag">Mounting</span><h3>Mounting Structures</h3><p>Rails, brackets and mounting components for different roof types.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="mounting">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing for solar mounting structures and accessories.">Enquire →</a></div>
-          </div>
-        </article>
-        <article class="card product-card catalog-product" data-category="electrical">
-          <div class="product-image" data-open-product="electrical"><img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&q=80" alt="Electrical protection accessories"></div>
-          <div class="card-body"><span class="product-tag">Electrical</span><h3>Protection & Electrical Accessories</h3><p>Breakers, isolators, surge protection, cables and connectors.</p><div class="price-note">Request current price</div>
-            <div class="product-actions"><button class="details-btn" type="button" data-open-product="electrical">View details</button><a class="btn" href="#" data-wa="Hello, I would like pricing for electrical protection devices and accessories.">Enquire →</a></div>
-          </div>
-        </article>
-      </div>
-      <p class="notice">Product images are illustrative. Product models, brands, specifications, stock status and prices should be updated from your actual supplier and inventory records before publishing.</p>
-    </div>
-  </div></div></section>
-  <section class="section section-soft"><div class="container"><div class="cta-band"><div><h2>Looking for a specific product?</h2><p>Send the model or specification and request a current quotation.</p></div><a class="btn" href="#" data-wa="Hello Harmonix Energy, I am looking for a solar or electrical product. Please assist with availability and pricing.">Ask for pricing →</a></div></div></section>
-</main>
-<div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
-  <div class="product-modal-panel">
-    <button class="product-modal-close" type="button" aria-label="Close product details">&times;</button>
-    <div class="product-modal-content">
-      <div class="product-modal-image"><img id="modal-image" src="" alt=""></div>
-      <div class="product-modal-copy"><span class="product-tag" id="modal-category"></span><h2 id="modal-title"></h2><p id="modal-description"></p><h3>What to consider</h3><ul class="product-specs" id="modal-specs"></ul><a class="btn" id="modal-enquire" href="#" target="_blank" rel="noopener">Request a Quote on WhatsApp →</a><p class="details-hint">Share your required capacity, application or preferred model so we can recommend a suitable option.</p></div>
-    </div>
-  </div>
-</div>
+<a class="brand" href="index.html" aria-label="Harmonix Energy home"><span class="brand-mark"><svg class="i " aria-hidden="true"><use href="#i-bolt"/></svg></span><span>HARMONIX<small>ENERGY SOLUTIONS</small></span></a>
+<div class="nav-cta"><a class="btn btn-sm" href="index.html#contact">Get a quote</a></div>
+<button class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav"><svg class="i " aria-hidden="true"><use href="#i-menu"/></svg></button>
+<nav class="nav-links" id="nav" aria-label="Main"><a href="index.html">Home</a><a href="services.html">Services</a><a href="products.html" aria-current="page">Products</a><a href="tools.html">Tools &amp; Resources</a><a href="index.html#projects">Projects</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></nav></div></header>
+<main id="main"><section class="page-hero on-dark"><div class="container"><span class="eyebrow">Equipment catalogue</span><h1>Quality equipment for reliable systems</h1><p>Browse the equipment we supply and install. Add items to an enquiry list and send it to us in one tap for current availability and pricing.</p></div></section>
+<section class="section"><div class="container catalog"><aside class="filters" aria-label="Product categories"><h3>Categories</h3><div class="filter-list" id="pr-filters"></div></aside>
+<div><div class="toolbar"><input class="field" id="pr-search" type="search" placeholder="Search products" aria-label="Search products"><select class="field" id="pr-sort" aria-label="Sort products"><option value="feat">Sort: featured</option><option value="az">Name A to Z</option><option value="price">Price: low to high</option></select></div><p class="hint" id="pr-count" aria-live="polite" style="margin-bottom:.8rem"></p>
+<div class="grid" id="pr-grid" style="--min:15rem"></div>
+<div class="cta" style="margin-top:2rem"><div><h2>Looking for something specific?</h2><p>Send us the brand, model or specification and we will source it and quote.</p></div><a class="btn" href="#" data-wa="Hello Harmonix Energy, I am looking for a specific product.">Ask for a price <svg class="i " aria-hidden="true"><use href="#i-arrow"/></svg></a></div></div></div></section>
+<button class="btn basket-btn hidden" id="basket-btn" type="button"><svg class="i " aria-hidden="true"><use href="#i-cart"/></svg> Enquiry list (<span id="basket-n">0</span>)</button>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Enquiry list"><div class="drawer-bg"></div><div class="drawer-panel"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Your enquiry list</h3><button class="menu-toggle" style="display:grid" type="button" id="drawer-close" aria-label="Close"><svg class="i " aria-hidden="true"><use href="#i-close"/></svg></button></div><ul id="drawer-list"></ul><p class="hint">We will reply with availability and current prices.</p><button class="btn" type="button" id="drawer-wa">Send on WhatsApp</button><button class="btn btn-ghost" type="button" id="drawer-mail">Send by email</button><button class="link" type="button" id="drawer-clear" style="align-self:flex-start;background:none;border:0;cursor:pointer">Clear list</button></div></div></main>
 <footer class="footer"><div class="container"><div class="footer-grid">
-  <div><a class="brand" href="index.html"><span class="brand-mark">ϟ</span><span>HARMONIX<small>ENERGY SOLUTIONS</small></span></a><p style="margin-top:18px;max-width:300px">Professional solar, electrical and security solutions for homes, businesses and industry.</p></div>
-  <div><h4>Explore</h4><div class="footer-links"><a href="services.html">Services</a><a href="products.html">Products catalogue</a><a href="tools.html">Tools & Resources</a><a href="index.html#projects">Projects</a></div></div>
-  <div><h4>Services</h4><div class="footer-links"><a href="services.html#pv">PV installations</a><a href="services.html#water">Solar water heating & heat pumps</a><a href="services.html#other">Electrical & security</a></div></div>
-  <div><h4>Contact</h4><div class="footer-links"><a href="tel:+254706813495">+254 706 813 495</a><a href="mailto:harmonixenergysolutions@gmail.com">harmonixenergysolutions@gmail.com</a><a href="#" data-wa="Hello Harmonix Energy, I would like to discuss a project.">WhatsApp enquiry</a></div></div>
-</div><div class="footer-bottom"><span>© <span data-year></span> Harmonix Energy Solutions. All rights reserved.</span><span>Powering reliable energy and electrical solutions.</span></div></div></footer>
-<script src="assets/js/main.js"></script>
-<script>
-(() => {
-  const products = {
-    panels: {
-      category: "Solar panels", title: "Solar PV Modules",
-      description: "Solar PV modules convert sunlight into DC electricity for use in grid-tied, hybrid and off-grid solar power systems. The right module depends on the system design, available roof or ground space and inverter compatibility.",
-      specs: ["Available technologies and wattages depend on current stock", "Compare rated power (Wp), module efficiency and physical dimensions", "Check Voc, Vmp, Isc and Imp against the inverter or charge controller limits", "Confirm product warranty, certifications and mounting compatibility"],
-      image: "https://images.unsplash.com/photo-1509391366360-2e959784e9e8?auto=format&fit=crop&w=900&q=85"
-    },
-    inverters: {
-      category: "Inverters", title: "Hybrid Inverters",
-      description: "Hybrid inverters manage power from solar PV, batteries and the utility grid or generator. They can support self-consumption, backup supply and battery charging, subject to the selected model and system configuration.",
-      specs: ["Single-phase and three-phase options may be available", "Select rated output power and surge capability for the connected loads", "Confirm battery voltage, chemistry and communication compatibility", "Check MPPT input range, maximum PV voltage and permitted PV capacity"],
-      image: "https://images.unsplash.com/photo-1592833159155-c62df1b65634?auto=format&fit=crop&w=900&q=85"
-    },
-    batteries: {
-      category: "Energy storage", title: "Lithium Batteries",
-      description: "Lithium iron phosphate (LiFePO4) batteries store energy generated by a solar PV system or supplied by the grid. They can provide backup power and shift energy use to periods when solar generation is low.",
-      specs: ["Compare nominal energy capacity (kWh) and usable capacity", "Confirm nominal voltage and maximum charge/discharge current", "Check inverter compatibility and supported BMS communication", "Review cycle-life conditions, warranty and installation requirements"],
-      image: "https://images.unsplash.com/photo-1620714223084-8fcacca6e9f3?auto=format&fit=crop&w=900&q=85"
-    },
-    controllers: {
-      category: "Controllers", title: "MPPT Charge Controllers",
-      description: "MPPT charge controllers regulate energy from PV modules to charge batteries efficiently in compatible off-grid systems. Correct selection requires matching the PV string voltage and current to the controller and battery specifications.",
-      specs: ["Confirm maximum PV open-circuit voltage, including cold-weather allowance", "Check maximum PV input power and charging current", "Match the controller to the battery bank voltage and chemistry", "Verify PV string configuration and protection requirements"],
-      image: "https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=900&q=85"
-    },
-    mounting: {
-      category: "Mounting", title: "Mounting Structures",
-      description: "Mounting structures secure PV modules to roofs or ground-mounted frames. The appropriate solution depends on the roof material, roof condition, wind exposure, module layout and site-specific structural requirements.",
-      specs: ["Options may include rails, clamps, brackets and ground-mount components", "Confirm compatibility with module frame dimensions and roof type", "Assess corrosion resistance and suitability for the installation environment", "Verify structural capacity, anchoring and waterproofing details"],
-      image: "https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=900&q=85"
-    },
-    electrical: {
-      category: "Electrical", title: "Protection & Electrical Accessories",
-      description: "Electrical balance-of-system components help provide safe isolation, overcurrent protection, surge protection and reliable connections in solar and general electrical installations.",
-      specs: ["DC and AC breakers, fuses and isolators selected for the circuit ratings", "Surge protection devices appropriate to the system and installation", "Solar PV cables, lugs, glands, connectors and distribution accessories", "Confirm voltage, current, breaking capacity, IP rating and applicable standards"],
-      image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=900&q=85"
-    }
-  };
-  const modal = document.getElementById("product-modal");
-  const closeBtn = modal.querySelector(".product-modal-close");
-  const modalImage = document.getElementById("modal-image");
-  const enquire = document.getElementById("modal-enquire");
-  let lastFocus = null;
-  function openProduct(key) {
-    const p = products[key]; if (!p) return;
-    lastFocus = document.activeElement;
-    document.getElementById("modal-category").textContent = p.category;
-    document.getElementById("modal-title").textContent = p.title;
-    document.getElementById("modal-description").textContent = p.description;
-    modalImage.src = p.image; modalImage.alt = p.title;
-    const list = document.getElementById("modal-specs"); list.replaceChildren();
-    p.specs.forEach(item => { const li = document.createElement("li"); li.textContent = item; list.appendChild(li); });
-    const message = `Hello Harmonix Energy, I am interested in ${p.title}. Please share available brands/models, detailed specifications, availability and pricing.`;
-    enquire.href = `https://wa.me/254706813495?text=${encodeURIComponent(message)}`;
-    modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden"; closeBtn.focus();
-  }
-  function closeProduct() {
-    modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = ""; if (lastFocus) lastFocus.focus();
-  }
-  document.querySelectorAll("[data-open-product]").forEach(el => {
-    el.addEventListener("click", () => openProduct(el.dataset.openProduct));
-    if (el.classList.contains("product-image")) {
-      el.setAttribute("role", "button"); el.setAttribute("tabindex", "0");
-      el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProduct(el.dataset.openProduct); } });
-    }
-  });
-  closeBtn.addEventListener("click", closeProduct);
-  modal.addEventListener("click", e => { if (e.target === modal) closeProduct(); });
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("open")) closeProduct(); });
-})();
-</script>
-</body>
-</html>
+<div><a class="brand" href="index.html"><span class="brand-mark"><svg class="i " aria-hidden="true"><use href="#i-bolt"/></svg></span><span>HARMONIX<small>ENERGY SOLUTIONS</small></span></a><p style="margin-top:1rem">Solar, electrical and security solutions for homes, businesses and industry. Designed properly, installed safely and supported long after handover.</p></div>
+<div><h4>Explore</h4><div class="footer-links"><a href="services.html">Services</a><a href="products.html">Products</a><a href="tools.html">Calculators</a><a href="proposal.html">Proposal builder</a><a href="index.html#projects">Projects</a></div></div>
+<div><h4>Services</h4><div class="footer-links"><a href="services.html#pv">Solar PV systems</a><a href="services.html#water">Water heating</a><a href="services.html#other">Electrical &amp; security</a></div></div>
+<div><h4>Contact</h4><div class="footer-links"><a href="tel:+254706813495">+254 706 813 495</a><a href="mailto:harmonixenergysolutions@gmail.com">harmonixenergysolutions@gmail.com</a><a href="#" data-wa="Hello Harmonix Energy, I would like to discuss a project.">WhatsApp us</a><span>Nairobi, Kenya</span></div></div>
+</div><div class="footer-bottom"><span>&copy; <span data-year></span> Harmonix Energy Solutions. All rights reserved.</span><span>Reliable power. Honest advice.</span></div></div></footer>
+<a class="fab" href="#" data-wa="Hello Harmonix Energy, I would like some help with a project." aria-label="Chat on WhatsApp"><svg class="i"><use href="#i-wa"/></svg></a>
+<script src="assets/js/config.js"></script><script src="assets/js/main.js"></script><script src="assets/js/products.js"></script></body></html>

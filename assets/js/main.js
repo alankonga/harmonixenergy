@@ -40,8 +40,52 @@
     });
   });
 
+  /* Scroll reveal: headings, text, cards and steps fade in as they come into view.
+     Content is only hidden once this script runs, and it is always revealed again by scrolling, so it can never stay invisible. */
+  var SEL = ".section-head > *, .hero-grid > div:first-child > :not(h1), .hero-media, .page-hero .container > :not(h1), .two-col > .photo, .two-col > div:last-child > *, .two-col > .contact-card, .card, .step, .faq, .cta, .contact-card, .tool-head, .trust li, .check-list li, .footer-grid > div, .notice";
+  var els = [];
+  document.querySelectorAll(SEL).forEach(function (el) {
+    if (el.closest(".drawer, .doc-wrap, .tool-body, .filters, #pr-grid") || el.classList.contains("pre")) return;
+    var sib = Array.prototype.indexOf.call(el.parentElement.children, el);
+    el.style.setProperty("--d", Math.min(sib, 6) * 90 + "ms");
+    el.classList.add("reveal", "pre"); els.push(el);
+  });
+  function check() {
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    els = els.filter(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92) { el.classList.add("in"); return false; }
+      return true;
+    });
+    if (!els.length) { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); }
+  }
+  var tick = false;
+  function onScroll() { if (tick) return; tick = true; requestAnimationFrame(function () { tick = false; check(); }); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  window.addEventListener("hashchange", onScroll);
+  window.addEventListener("load", check);
   if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }); }, { threshold: .12 });
-    document.querySelectorAll(".reveal").forEach(function (el) { var r = el.getBoundingClientRect(); if (r.top > window.innerHeight) { el.classList.add("pre"); io.observe(el); } });
-  } else document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) x.target.classList.add("in"); }); }, { rootMargin: "0px 0px -8% 0px" });
+    els.forEach(function (el) { io.observe(el); });
+  }
+  requestAnimationFrame(function () { requestAnimationFrame(check); });
+
+  /* Headline words rise in one by one */
+  document.querySelectorAll(".hero h1, .page-hero h1").forEach(function (h) {
+    var n = 0;
+    (function walk(node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (c) {
+        if (c.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          c.textContent.split(/(\s+)/).forEach(function (t) {
+            if (!t) return;
+            if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(" ")); return; }
+            var s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", n++); s.textContent = t; frag.appendChild(s);
+          });
+          node.replaceChild(frag, c);
+        } else if (c.nodeType === 1) walk(c);
+      });
+    })(h);
+  });
 })();

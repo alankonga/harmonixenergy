@@ -18,6 +18,7 @@ A fast, mobile-first, multi-page static website for GitHub Pages. No build step.
 - **Load calculator:** one-tap appliance presets, editable quantities and hours, motor start-up surge, battery type and depth, system voltage, cloudy-day buffer, growth margin, array space, charge-controller current, biggest energy users, saved between visits.
 - **Savings estimator:** works from a bill (KES) or units (kWh), shows monthly and yearly savings, roof-fit check, battery for backup hours, payback (if you enter a quote), and a comparison of 50 / 70 / 90 / 100% solar share.
 - **Proposal builder:** a real tool. Import the calculator design, build the bill of quantities, set VAT, terms and warranty, and print a clean 3-page A4 proposal. A free one-page sample is available; the full version is unlocked with a code.
+- **Text appears as you scroll.** Headlines rise in word by word, and sections, cards and steps fade in as they come into view. Nothing is hidden if scripts fail, and visitors who prefer reduced motion see everything at once. Edit the list in `assets/js/main.js` (`SEL`) to choose what animates.
 - Calculators and proposals can be sent to you on WhatsApp, copied, or printed.
 
 ## Settings you should edit

@@ -29,12 +29,12 @@
     $("lc-presets").innerHTML = PRESETS.map(function (p, i) { return '<button type="button" class="chip" data-p="' + i + '">+ ' + p[0] + '</button>'; }).join("");
     ["sun", "panel", "batt", "volt", "auto", "margin", "div"].forEach(function (k) { var el = $("lc-" + k); el.value = st[k]; el.addEventListener("input", function () { st[k] = el.tagName === "SELECT" && isNaN(el.value) ? el.value : parseFloat(el.value); save(); calc(); }); });
 
-    var add = function (name, w, qty, d, n, motor) {
-      var ex = items.filter(function (i) { return i.name.toLowerCase() === name.toLowerCase() && i.w === w; })[0];
+    var add = function (name, w, qty, d, n, motor, preset) {
+      var ex = items.filter(function (i) { return i.name.toLowerCase() === name.toLowerCase() && (preset || i.w === w); })[0];
       if (ex) ex.qty += qty; else items.push({ name: name, w: w, qty: qty, day: d, night: n, motor: !!motor });
       save(); draw(); calc();
     };
-    $("lc-presets").addEventListener("click", function (e) { var b = e.target.closest("[data-p]"); if (!b) return; var p = PRESETS[+b.dataset.p]; add(p[0], p[1], 1, p[2], p[3], p[4]); });
+    $("lc-presets").addEventListener("click", function (e) { var b = e.target.closest("[data-p]"); if (!b) return; var p = PRESETS[+b.dataset.p]; add(p[0], p[1], 1, p[2], p[3], p[4], true); });
     $("lc-form").addEventListener("submit", function (e) {
       e.preventDefault();
       var n = $("lc-name").value.trim(), w = parseFloat($("lc-w").value);
@@ -45,7 +45,7 @@
     function draw() {
       if (!items.length) { lcEl.innerHTML = '<tr><td colspan="7" class="hint" style="padding:1.2rem;text-align:center">No appliances yet. Tap a quick-add button above or enter your own.</td></tr>'; return; }
       lcEl.innerHTML = items.map(function (a, i) {
-        return '<tr data-i="' + i + '"><td data-l="Appliance"><strong>' + esc(a.name) + '</strong>' + (a.motor ? ' <span class="tag">motor</span>' : '') + '</td><td data-l="Watts">' + a.w + ' W</td>' +
+        return '<tr data-i="' + i + '"><td data-l="Appliance"><strong>' + esc(a.name) + '</strong>' + (a.motor ? ' <span class="tag">motor</span>' : '') + '</td><td data-l="Watts (W)"><input type="number" min="1" step="any" value="' + a.w + '" data-k="w" aria-label="Wattage of ' + esc(a.name) + '" title="Change this to match the label on your appliance"></td>' +
           '<td data-l="Qty"><input type="number" min="1" value="' + a.qty + '" data-k="qty" aria-label="Quantity of ' + esc(a.name) + '"></td>' +
           '<td data-l="Day hours"><input type="number" min="0" max="24" step="0.5" value="' + a.day + '" data-k="day" aria-label="Day hours for ' + esc(a.name) + '"></td>' +
           '<td data-l="Night hours"><input type="number" min="0" max="24" step="0.5" value="' + a.night + '" data-k="night" aria-label="Night hours for ' + esc(a.name) + '"></td>' +
@@ -55,7 +55,7 @@
     }
     lcEl.addEventListener("input", function (e) {
       var tr = e.target.closest("tr[data-i]"); if (!tr) return; var a = items[+tr.dataset.i], k = e.target.dataset.k; if (!k) return;
-      var v = parseFloat(e.target.value); a[k] = k === "qty" ? Math.max(1, Math.floor(v) || 1) : Math.min(24, Math.max(0, v || 0));
+      var v = parseFloat(e.target.value); a[k] = k === "qty" ? Math.max(1, Math.floor(v) || 1) : k === "w" ? Math.max(1, v || 1) : Math.min(24, Math.max(0, v || 0));
       tr.querySelector("[data-wh]").textContent = Math.round(a.w * a.qty * (a.day + a.night)).toLocaleString(); save(); calc();
     });
     lcEl.addEventListener("click", function (e) { var b = e.target.closest("[data-rm]"); if (!b) return; items.splice(+b.closest("tr").dataset.i, 1); save(); draw(); calc(); });

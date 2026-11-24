@@ -1,31 +1,43 @@
-# Harmonix Energy Website Starter
+# Harmonix Energy website (version 2)
 
-This is a responsive, static multi-page website for GitHub Pages.
+A fast, mobile-first, multi-page static website for GitHub Pages. No build step. Plain HTML, CSS and JavaScript.
 
 ## Pages
-- `index.html` — Homepage
-- `services.html` — Installation and technical services
-- `products.html` — Products catalogue with category filters and WhatsApp enquiries
-- `tools.html` — Appliance load calculator, solar sizing estimator, sizing sheets and proposal automation
+| Page | What it does |
+|---|---|
+| `index.html` | Home: services, process, projects, tools, FAQ and enquiry form |
+| `services.html` | PV, water heating and other technical services |
+| `products.html` | Product catalogue with search, filters, sorting and an enquiry list (WhatsApp or email) |
+| `tools.html` | Appliance load calculator and solar savings estimator, plus sizing-sheet requests |
+| `proposal.html` | Proposal builder: live preview, print or save as PDF |
+
+## What changed from version 1
+- **Layout adapts to every screen.** Fluid sizes (`rem`, `clamp`, auto-fitting grids) replace fixed breakpoints, so it works from small phones to wide monitors and at any browser zoom. No sideways scrolling at 320 px to 1920 px wide.
+- **New colour palette.** Deep navy for trust, solar amber for actions, and a readable green for confirmation. Includes automatic dark mode. All text meets contrast guidelines.
+- **Clearer wording.** Benefit-led headlines, plain language, Kenya-specific answers (KPLC, outages, WhatsApp).
+- **Load calculator:** one-tap appliance presets, editable quantities and hours, motor start-up surge, battery type and depth, system voltage, cloudy-day buffer, growth margin, array space, charge-controller current, biggest energy users, saved between visits.
+- **Savings estimator:** works from a bill (KES) or units (kWh), shows monthly and yearly savings, roof-fit check, battery for backup hours, payback (if you enter a quote), and a comparison of 50 / 70 / 90 / 100% solar share.
+- **Proposal builder:** a real tool. Import the calculator design, build the bill of quantities, set VAT, terms and warranty, and print a clean 3-page A4 proposal. A free one-page sample is available; the full version is unlocked with a code.
+- Calculators and proposals can be sent to you on WhatsApp, copied, or printed.
+
+## Settings you should edit
+Everything lives in `assets/js/config.js`: phone, email, default tariff, default sun hours, proposal price, M-Pesa note and unlock codes.
+
+### Selling full proposals (KES 100)
+The free sample is always available. The full proposal is unlocked by a code:
+1. Customer pays KES 100 by M-Pesa (put your Till/Paybill text in `paymentNote`).
+2. They send you the M-Pesa message on WhatsApp.
+3. You reply with a code.
+
+Codes are stored as SHA-256 fingerprints. To add one: open any page, press F12, type `hxHash("MYCODE-001").then(console.log)`, and copy the result into `unlockHashes`. Codes are not case sensitive. **The demo code `HX-DEMO` is included for testing. Remove it before launch.**
+This is a light gate for a low-priced item. Anyone technical can bypass it, because a static website cannot verify payments. For automatic M-Pesa verification you would need a small server (Daraja API).
+
+## Before you publish
+- Replace the Unsplash stock photos (they load from the internet) with your own project photos. Put them in `assets/img/` and update the `src` attributes. Photos are labelled "illustrative" on the homepage.
+- Confirm the EPRA wording on the badge. Add your licence class/number only if appropriate.
+- Add real products, brands and prices in `assets/js/products.js`. Leave `price: null` to show "Request current price".
+- Calculator results are preliminary estimates. They use standard assumptions: 75% overall PV efficiency, battery depth 90% (lithium) or 50% (lead-acid), 25% inverter margin.
+- Add real sizing-sheet files if you want direct downloads. At present those buttons send a WhatsApp request.
 
 ## Deploy to GitHub Pages
-1. Download and unzip this folder.
-2. Review all text, phone/email details, EPRA credential wording, images and product information.
-3. Copy the contents of this folder into the root of your `harmonix-energy` repository, replacing the old files only after making a backup.
-4. Commit and push to the `main` branch.
-5. GitHub Pages should publish the site from the repository root.
-
-## Before publishing
-- Confirm the company EPRA licence wording and add the actual licence class/number only if appropriate.
-- Replace illustrative images and project examples with real, approved project photographs and verified project information.
-- Add actual product brands, models, specifications, stock status and KES prices. The catalogue currently uses enquiry pricing to avoid inventing prices.
-- Confirm the WhatsApp phone number and email.
-- Add actual downloadable Excel/PDF sizing sheets and connect proposal automation to its payment and document-generation workflow.
-- The calculator outputs are preliminary estimates and must be checked by a competent designer before equipment procurement or installation.
-
-## Technical notes
-- No build step or framework is required.
-- Uses plain HTML, CSS and JavaScript.
-- The calculator and product filters work in the browser.
-- Product and contact enquiries open WhatsApp.
-- Photography is loaded from Unsplash URLs; replace with locally hosted, licensed company images for production use.
+Copy everything in this folder to the root of your repository, commit and push. Keep the `assets` folder as it is.
